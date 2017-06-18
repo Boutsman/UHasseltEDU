@@ -25,6 +25,12 @@ import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
 import org.openide.util.lookup.ProxyLookup;
 
+/**
+ * Deze klasse houdt de informatie bij van een BlueJ project
+ * Deze klasse is gebaseerd op de NetBeans Project Type Module Tutorial (https://platform.netbeans.org/tutorials/nbm-projecttype.html)
+ * 
+ * @author Stijn Boutsen
+ */
 public class BlueJProject implements Project {
 
     //Directory van het project wordt bijgehouden

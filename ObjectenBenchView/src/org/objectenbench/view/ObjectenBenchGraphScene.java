@@ -73,10 +73,9 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                     public void actionPerformed(ActionEvent event) {
                         String menuText = event.getActionCommand();
                         String[] parts = menuText.split(" ");
-                        System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
+                        //System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
 
                         Method[] methodes = node.getClass().getDeclaredMethods();
-                        System.out.println(node.getClass().getSimpleName());
                         tekenJFrame(methodes[Integer.parseInt(parts[0])]);
 
                         Method m = methodes[Integer.parseInt(parts[0])];
@@ -84,7 +83,7 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                         //Ga na of het een getter of setter is
                         if (methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName().equals("void")) {
                             System.out.println("Methode zonder returnwaarde");
-                            System.out.println(methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName());
+                           // System.out.println(methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName());
                             if (m.getParameters() != null) {
                                 try {
                                     m.invoke(node /*,parameters*/);

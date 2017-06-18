@@ -1,11 +1,8 @@
 package org.classdiagram.view;
 
-import java.awt.BorderLayout;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -17,7 +14,9 @@ import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
-import org.project.data.*;
+import org.project.data.JavaBestand;
+import org.project.data.ProjectData;
+import org.project.data.Relatie;
 
 /**
  * Top component which displays something.
@@ -93,6 +92,7 @@ public final class classdiagramTopComponent extends TopComponent {
 
         //Opvragen van de projectbestanden
         Project project = OpenProjects.getDefault().getOpenProjects()[0];
+        //Project project = OpenProjects.getDefault().getMainProject();
         blueJData = new ProjectData();
 
         if (project != null) {
@@ -109,7 +109,7 @@ public final class classdiagramTopComponent extends TopComponent {
                 /*Vraag nodig info op uit package.bluej*/
                 blueJData.verwerkBlueJPackageFile(projectDir.getFileObject("package.bluej").getPath());
                 blueJData.setIsARelaties();
-                blueJData.setPackageBlueJ();
+                //blueJData.setPackageBlueJ();
             } /*Doe iets indien het om een standaard Java project gaat*/ else if (projectDir.getFileObject("src") != null) {
                 System.out.println("***Project type: Standaard java project");
                 verwerkNetBeansJavaProject(projectDir);
@@ -137,7 +137,7 @@ public final class classdiagramTopComponent extends TopComponent {
         FileObject[] mapInhoud = map.getChildren();
         for (FileObject inhoud : mapInhoud) {
             /*Laad alle java-bestanden in*/
-            if (inhoud.hasExt("java")) {                
+            if (inhoud.hasExt("java")) {
                 String[] temp = projectDir.getPath().split("/");
                 bestanden.add(temp[temp.length - 1].toLowerCase() + "." + inhoud.getName());
                 fileDir.add(projectDir.getPath() + "/build/classes/");
@@ -220,7 +220,7 @@ public final class classdiagramTopComponent extends TopComponent {
                 }
 
             } catch (NullPointerException ex) {
-                System.out.println(ex);
+                System.err.println(ex);
             }
         }
         return scene;

@@ -56,7 +56,7 @@ import org.project.data.Reflection;
 import org.project.data.Relatie;
 
 /**
- 
+ *
  * @author Stijn Boutsen
  */
 public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.StringGraph*/ {
@@ -95,38 +95,32 @@ public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.S
                     @Override
                     public void actionPerformed(ActionEvent event) {
                         String menuText = event.getActionCommand();
-                        System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
+                        //System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
                         String[] parts = menuText.split(" ");
                         Reflection reflectie = new Reflection();
 
-                        Constructor[] constr = reflectie.getAlleConstructors(node.laadKlasse());                        
-
-                        System.out.println("Aanmaken van object: " + node.getNaam());
+                        Constructor[] constr = reflectie.getAlleConstructors(node.laadKlasse());
 
                         Object obj = null;
 
-                        if (constr[Integer.parseInt(parts[0])].getParameters() == null) {
+                        if (constr[Integer.parseInt(parts[0])].getParameters().length == 0) {
                             System.out.println("Object zonder parameters aanmaken");
                             obj = reflectie.createInstance(node.laadKlasse(), Integer.parseInt(parts[0]));
                         } else {
                             System.out.println("Object met parameters aanmaken");
-                            tekenJFrame(node, Integer.parseInt(parts[0]));                              
+                            tekenJFrame(node, Integer.parseInt(parts[0]));
                         }
 
                         if (obj != null) {
-                            Method[] methodes = reflectie.getAlleMethodes(obj);
-                            System.out.println("Methodes van het object: " + Arrays.toString(methodes));
-                            addObject(obj);
+                            //Method[] methodes = reflectie.getAlleMethodes(obj);
+                            //System.out.println("Methodes van het object: " + Arrays.toString(methodes));
+                            //addObject(obj);
                             ObjectenBench bench = ObjectenBench.getInstance();
                             bench.voegObjectToe(obj);
                             System.out.println("Object geladen");
                         } else {
-                            System.out.println("Geen object geladen");
+                            System.err.println("Object niet geladen");
                         }
-                        //ArrayList<Object> alleObj = bench.getObjBench();
-                        //System.out.println(alleObj);
-                        //System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getID());
-                        //System.out.println(parts[0]);
                     }
                 };
                 JMenuItem item;
@@ -143,6 +137,7 @@ public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.S
                 return popup;
             }
         }));
+        
         mainLayer.addChild(widget);
         return widget;
     }
@@ -178,14 +173,17 @@ public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.S
         ((ConnectionWidget) findWidget(edge)).setTargetAnchor(AnchorFactory.createRectangularAnchor(w));
     }
 
-    private void tekenJFrame(final JavaBestand node,final int constrNr) {
+    private void tekenJFrame(final JavaBestand node, final int constrNr) {
+        System.out.println("Methode: tekenJFrame");
         final Reflection reflectie = new Reflection();
-        Constructor[] constr = reflectie.getAlleConstructors(node.laadKlasse());
+        final Class klasse = node.laadKlasse();
+        Constructor[] constr = reflectie.getAlleConstructors(klasse);
         Parameter[] params = constr[constrNr].getParameters();
         final Class[] paramTypes = constr[constrNr].getParameterTypes();
+        final JFrame constructorFrame = new JFrame();
 
         if (params.length > 0) {
-            final JFrame constructorFrame = new JFrame();
+
             constructorFrame.setTitle("Add constructor parameters");
 
             constructorFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -219,14 +217,16 @@ public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.S
                     ArrayList<Object> params = new ArrayList<Object>();
                     int i = 0;
                     for (JTextField textFieldParam : textFieldParam) {
-                        params.add(convert(paramTypes[i],textFieldParam.getText()));                        
+                        System.out.println(paramTypes[i] + " - " + textFieldParam.getText());
+                        System.out.println(convert(paramTypes[i], textFieldParam.getText()));
+                        params.add(convert(paramTypes[i], textFieldParam.getText()));
                     }
                     
-                    Object obj = reflectie.createInstance2(node.laadKlasse(), constrNr,params);
+                    Object obj = reflectie.createInstance2(node.laadKlasse(), constrNr, params.toArray(new Object[params.size()]));
                     ObjectenBench bench = ObjectenBench.getInstance();
                     bench.voegObjectToe(obj);
                     //close the JFrame
-                    //constructorFrame.dispose();
+                    constructorFrame.dispose();                    
                 }
             });
             panel.add(okBtn);
@@ -240,13 +240,13 @@ public class ClassDiagramGraphScene extends GraphScene<JavaBestand, Relatie>/*.S
             layout.putConstraint(SpringLayout.SOUTH, contentPane, 5, SpringLayout.SOUTH, panel);
 
             constructorFrame.add(panel);
-            constructorFrame.pack();
-            constructorFrame.setVisible(true);
 
         }
+        constructorFrame.pack();
+        constructorFrame.setVisible(true);
 
     }
-    
+
     private static Object convert(Class<?> targetType, String textWaarde) {
         PropertyEditor editor = PropertyEditorManager.findEditor(targetType);
         editor.setAsText(textWaarde);

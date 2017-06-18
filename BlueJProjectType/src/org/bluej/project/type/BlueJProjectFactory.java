@@ -12,6 +12,12 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service=ProjectFactory.class)
+/**
+ * Deze klasse identificeert en laadt BlueJ projecten
+ * Deze klasse is gebaseerd op de NetBeans Project Type Module Tutorial (https://platform.netbeans.org/tutorials/nbm-projecttype.html)
+ * 
+ * @author Stijn Boutsen
+ */
 public class BlueJProjectFactory implements ProjectFactory {
 
     //We geven het bestand op dat aangeeft dat het om een BlueJ project gaat.

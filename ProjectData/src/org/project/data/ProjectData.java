@@ -131,7 +131,7 @@ public class ProjectData {
 
             // Controle of de eerste regel van het bestand niet fout is
             if (!allLines[0].equals("#BlueJ package file")) {
-                System.out.println("Bestand is geen correct package.bluej bestand");
+                System.err.println("Bestand is geen correct package.bluej bestand");
             } else {
                 // Verwerking van resterende regels
                 for (int i = 1; i < allLines.length; i++) {
@@ -175,7 +175,7 @@ public class ProjectData {
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
 
         // Sla alle info voor de javaBestanden op
@@ -261,13 +261,13 @@ public class ProjectData {
             writer.close();
             System.out.println("***UHasseltEDU_INFO: Package.bluej aangemaakt");
         } catch (IOException e) {
-            System.out.println(e);
-            System.out.println("***UHasseltEDU_INFO: Package.bluej niet aangemaakt");
+            System.err.println(e);
+            System.err.println("***UHasseltEDU_INFO: Package.bluej niet aangemaakt");
         }
     }
 
     public void setIsARelaties() {
-        System.out.println("Functie setIsARelaties() in ProjectData.java");
+        //System.out.println("Functie setIsARelaties() in ProjectData.java");
         ArrayList<Relatie> rel = new ArrayList<Relatie>();
         for (JavaBestand j : javaBestanden) {
             Class myClass = j.laadKlasse();
@@ -276,21 +276,14 @@ public class ProjectData {
 
                 for (JavaBestand k : javaBestanden) {
                     if (getJavaBestand(mySuperClass.getSimpleName()) != null && k.getNaam().equals(mySuperClass.getName())) {
-                        System.out.println("*************** " + myClass.getName() + " erft van " + mySuperClass.getName());
-                        System.out.println(mySuperClass.getName());
-                        System.out.println(k.getNaam());
+                        //System.out.println("*************** " + myClass.getName() + " erft van " + mySuperClass.getName());
+                        //System.out.println(mySuperClass.getName());
+                        //System.out.println(k.getNaam());
                         rel.add(new Relatie("1", j, k, "isA"));
-
-                        /*if(tempRelaties == null){
-                         tempRelaties[0] = new Relatie("1", j, k, "isA");
-                         }
-                         else{
-                         tempRelaties[tempRelaties.length] = new Relatie("1", j, k, "isA");
-                         }*/
                     }
                 }
             } else {
-                System.out.println("Error: Class not loaded");
+                System.err.println("Error: Class not loaded");
             }
         }
 
@@ -302,7 +295,6 @@ public class ProjectData {
         for (int i = 0; i < rel.size(); i++) {
             tempRelaties[i] = rel.get(i);
         }
-        System.out.println(Arrays.toString(tempRelaties));
         setRelaties(tempRelaties);
     }
 
@@ -324,31 +316,4 @@ public class ProjectData {
      System.out.println("*************** velden: " + Arrays.toString(myClass.getDeclaredFields()));
      }
      }*/
-//    public Class maakKlasse(FileObject map) {
-//        String lookupPath = map.getParent().getPath() + "/";
-//        Class myClass;
-//        String pad = map.getName();
-//        try {
-//            URL url = new File(lookupPath).toURL();
-//            URL[] urls = new URL[]{url};
-//            ClassLoader myLoader = new URLClassLoader(urls);
-//            myClass = myLoader.loadClass(pad);
-//            return myClass;
-//        } catch (MalformedURLException ex) {
-//            Exceptions.printStackTrace(ex);
-//            System.out.println("URL is verkeerd");
-//            return null;
-//        } catch (ClassNotFoundException ex) {
-//            Exceptions.printStackTrace(ex);
-//            System.out.println("Klasse niet geladen");
-//            return null;
-//        }        
-//    }
 }
-
-//                                File file = new File(packageMap.getPath()+"/package.bluej");
-//                                try {
-//                                    file.createNewFile();
-//                                } catch (IOException ex) {
-//                                    Exceptions.printStackTrace(ex);
-//                                }

@@ -234,29 +234,29 @@ public class JavaBestand {
      * @return
      */
     public Class laadKlasse() {
-        System.out.println("***LaadKlasse");
+        //System.out.println("***LaadKlasse");
         Class myClass = null;
         try {            
             String lookupPath = url.replace(naam + ".java", "");
             String pad = naam;
-            System.out.println("***lookupPath: " + lookupPath);
-            System.out.println("***naam: " + naam);
+            //System.out.println("***lookupPath: " + lookupPath);
+            //System.out.println("***naam: " + naam);
 
             URL urlFile = new File(lookupPath).toURL();
-            System.out.println(urlFile.toString());
+            //System.out.println(urlFile.toString());
             URL[] urls = new URL[]{urlFile};
-            System.out.println(Arrays.toString(urls));
+            //System.out.println(Arrays.toString(urls));
             ClassLoader myLoader = new URLClassLoader(urls);
-            System.out.println(myLoader);
+            //System.out.println(myLoader);
             myClass = myLoader.loadClass(pad);
-            System.out.println("***Klasse geladen " + myClass.getName());
+            //System.out.println("***Klasse geladen " + myClass.getName());
         } catch (MalformedURLException ex) {
             Exceptions.printStackTrace(ex);
-            System.out.println("URL is verkeerd");
+            System.err.println("URL is verkeerd");
             return null;
         } catch (ClassNotFoundException ex) {
             Exceptions.printStackTrace(ex);
-            System.out.println("***Klasse niet geladen");
+            System.err.println("***Klasse niet geladen");
             return null;
         }
         return myClass;

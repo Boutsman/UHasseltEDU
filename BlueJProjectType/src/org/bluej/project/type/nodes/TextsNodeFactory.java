@@ -15,7 +15,12 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 
 @NodeFactory.Registration(projectType = "org-bluej-project", position = 10)
-
+/**
+ * Deze klasse bepaalt de bestanden die in het project window als nodes worden voorgesteld.
+ * Deze klasse is gebaseerd op de NetBeans Project Type Module Tutorial (https://platform.netbeans.org/tutorials/nbm-projecttype.html)
+ * 
+ * @author Stijn Boutsen
+ */
 public class TextsNodeFactory implements NodeFactory {
     
     @Override

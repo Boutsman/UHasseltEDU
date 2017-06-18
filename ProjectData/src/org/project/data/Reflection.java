@@ -9,15 +9,13 @@ import java.util.ArrayList;
 
 /**
  * @author Boutsman
- * @version 0.5
+ * @version 0.9
  */
 public class Reflection {
     
     public Reflection(){
 
     }
-
-    //Methodes uit te voeren op klassen
     
     /**
      * Get the class name from a Class
@@ -91,22 +89,12 @@ public class Reflection {
      * @return m1 the Object made from the Class
      */
     public Object createInstance(Class klasse, int constrNr) {
-        /*
-        //create instance of "Class"
-        Class<?> c = null;
-        try {
-            c = Class.forName(klasse.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Geen klasse aanwezig met naam: " + klasse.getName());
-        }*/
-
-        //create instance of "Mens"
         Object m1 = null;
 
         //get all constructors
         Constructor<?> cons[] = klasse.getConstructors();
 
+        //voer een bepaalde constructor zonder parameters uit
         try {
             m1 = (Object) cons[constrNr].newInstance();
         } catch (Exception e) {
@@ -132,35 +120,26 @@ public class Reflection {
     /**
      * Hier probeer ik de vorige methode te hervormen zodat:
      * We de constructor kunnen kiezen
-     * De parameters kunnen toevoegen indien nodig
+     * De parameters kunnen toevoegen worden indien nodig
      * @param klasse
-     * @param param1
-     * @param param2
-     * @param param3
+     * @param constrNr
+     * @param param
      * @return 
      */    
     public Object createInstance2(Class klasse, int constrNr, Object... param) {
-        //create instance of "Class"
-        Class<?> c = null;
-        try {
-            c = Class.forName(klasse.getName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //create instance of an object
-        Object obj = null;
+        Object m1 = null;
 
         //get all constructors
-        Constructor<?> cons[] = c.getConstructors();
-        
+        Constructor<?> cons[] = klasse.getConstructors();
+
+        //voer een bepaalde constructor zonder parameters uit
         try {
-            obj = (Object) cons[constrNr].newInstance(param);
+            m1 = (Object) cons[constrNr].newInstance(param);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return obj;
+        
+        return m1;
     }
     
     /**
@@ -185,9 +164,7 @@ public class Reflection {
         ArrayList<String> dataMembersNames = new ArrayList<String>();
         for(Field member:dataMembers){
             dataMembersNames.add(member.getType().getName());
-            System.out.println(member.getType());
         }
-        System.out.println(dataMembersNames.toString());
         return dataMembersNames;
     }
     
