@@ -34,7 +34,6 @@ import org.netbeans.api.visual.widget.LabelWidget;
 import org.netbeans.api.visual.widget.LayerWidget;
 import org.netbeans.api.visual.widget.Widget;
 import org.openide.util.Exceptions;
-import org.project.data.ObjectenBench;
 
 /**
  * @author Stijn Boutsen
@@ -78,7 +77,7 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                     public void actionPerformed(ActionEvent event) {
                         String menuText = event.getActionCommand();
                         String[] parts = menuText.split(" ");
-                        //System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
+                        System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
 
                         Method[] methodes = node.getClass().getDeclaredMethods();
                         //tekenJFrame(methodes[Integer.parseInt(parts[0])]);
@@ -242,7 +241,7 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
             panel.add(okBtn);
 
             SpringUtilities.makeGrid(panel,
-                    params.length, 2, //rows, cols
+                    params.length+1, 2, //rows, cols
                     5, 5, //initialX, initialY
                     5, 5);//xPad, yPad
 
@@ -263,13 +262,17 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
         Container contentPane = returnFrame.getContentPane();
         SpringLayout layout = new SpringLayout();
         JPanel panel = new JPanel(layout);
+        JLabel infoLabel1 = new JLabel("Returntype");
+        panel.add(infoLabel1);
+        JLabel infoLabel2 = new JLabel("Returnvalue");
+        panel.add(infoLabel2);
         JLabel typeLabel = new JLabel(m.getReturnType().getSimpleName());
         panel.add(typeLabel);
         JLabel returnWaardeLabel = new JLabel(returnwaarde, JLabel.TRAILING);
         panel.add(returnWaardeLabel);
 
         SpringUtilities.makeGrid(panel,
-                1, 2, //rows, cols
+                2, 2, //rows, cols
                 5, 5, //initialX, initialY
                 5, 5);//xPad, yPad
 

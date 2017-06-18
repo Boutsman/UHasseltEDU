@@ -2,8 +2,10 @@ package org.project.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.openide.filesystems.FileObject;
 
 /**
  * Deze klasse houdt de informatie bij die nodig is om een java project te
@@ -244,19 +246,19 @@ public class ProjectData {
             writer.println("readme.editor.y=-9");
             //klassen toevoegen            
             for (JavaBestand b : javaBestanden) {
-                writer.println("target"+b.getIndex()+".editor.height=");
-                writer.println("target"+b.getIndex()+".editor.width=");
-                writer.println("target"+b.getIndex()+".editor.x=");
-                writer.println("target"+b.getIndex()+".editor.y=");
-                writer.println("target"+b.getIndex()+".height=");
-                writer.println("target"+b.getIndex()+".name="+b.getNaam());
-                writer.println("target"+b.getIndex()+".naviview.expanded=true");
-                writer.println("target"+b.getIndex()+".showInterface=false");
-                writer.println("target"+b.getIndex()+".type="); //extra info toevoegen
-                writer.println("target"+b.getIndex()+".typeParameters=");
-                writer.println("target"+b.getIndex()+".width=");
-                writer.println("target"+b.getIndex()+".x=");
-                writer.println("target"+b.getIndex()+".y=");
+                writer.println("target" + b.getIndex() + ".editor.height=");
+                writer.println("target" + b.getIndex() + ".editor.width=");
+                writer.println("target" + b.getIndex() + ".editor.x=");
+                writer.println("target" + b.getIndex() + ".editor.y=");
+                writer.println("target" + b.getIndex() + ".height=");
+                writer.println("target" + b.getIndex() + ".name=" + b.getNaam());
+                writer.println("target" + b.getIndex() + ".naviview.expanded=true");
+                writer.println("target" + b.getIndex() + ".showInterface=false");
+                writer.println("target" + b.getIndex() + ".type="); //extra info toevoegen
+                writer.println("target" + b.getIndex() + ".typeParameters=");
+                writer.println("target" + b.getIndex() + ".width=");
+                writer.println("target" + b.getIndex() + ".x=");
+                writer.println("target" + b.getIndex() + ".y=");
             }
             writer.close();
             System.out.println("***UHasseltEDU_INFO: Package.bluej aangemaakt");
@@ -266,6 +268,11 @@ public class ProjectData {
         }
     }
 
+    /**
+     * Methode voor het opslaan van erving. Deze informatie wordt opgeslagen in
+     * een array Relatie[] Dit type relaties wordt voorgesteld als "is a"
+     * relatie
+     */
     public void setIsARelaties() {
         //System.out.println("Functie setIsARelaties() in ProjectData.java");
         ArrayList<Relatie> rel = new ArrayList<Relatie>();
@@ -275,10 +282,13 @@ public class ProjectData {
                 Class mySuperClass = myClass.getSuperclass();
 
                 for (JavaBestand k : javaBestanden) {
+                    //System.out.println(mySuperClass.getName());
+                    //System.out.println(k.getNaam());
                     if (getJavaBestand(mySuperClass.getSimpleName()) != null && k.getNaam().equals(mySuperClass.getName())) {
                         //System.out.println("*************** " + myClass.getName() + " erft van " + mySuperClass.getName());
-                        //System.out.println(mySuperClass.getName());
-                        //System.out.println(k.getNaam());
+                        rel.add(new Relatie("1", j, k, "isA"));
+                    } else if (getJavaBestand(mySuperClass.getName()) != null && k.getNaam().equals(mySuperClass.getName())) {
+                        //System.out.println("*************** " + myClass.getName() + " erft van " + mySuperClass.getName());
                         rel.add(new Relatie("1", j, k, "isA"));
                     }
                 }
@@ -288,8 +298,10 @@ public class ProjectData {
         }
 
         Relatie[] temp = getRelaties();
-        for (Relatie t : temp) {
-            rel.add(t);
+        if (temp != null) {
+            for (Relatie t : temp) {
+                rel.add(t);
+            }
         }
         Relatie[] tempRelaties = new Relatie[rel.size()];
         for (int i = 0; i < rel.size(); i++) {
@@ -298,6 +310,49 @@ public class ProjectData {
         setRelaties(tempRelaties);
     }
 
+    /**
+     * Methode voor het opslaan van de compositie van het programma Deze
+     * informatie wordt opgeslagen in een array Relatie[] Dit type relaties
+     * wordt voorgesteld als "has a" relatie
+     *
+     * @param dir
+     */
+    public void setHasARelaties() {
+        ArrayList<String> jBestandsNamen = new ArrayList<String>();
+        for(JavaBestand j:javaBestanden){
+            jBestandsNamen.add(j.getNaam());
+        }
+        //getDeclaredFields geeft enkel globale dataMembers
+        //lokale dataMembers worden in de .java bestanden gezocht
+        ArrayList<Relatie> rel = new ArrayList<Relatie>();
+        for (JavaBestand j : javaBestanden) {
+            Field[] velden = j.laadKlasse().getDeclaredFields();
+            System.out.println(j.getNaam());
+            for(Field f:velden){
+                if(jBestandsNamen.contains(f.getType().getName())){
+                    System.out.println("Datamembers gevonden");
+                    rel.add(new Relatie("1", j, getJavaBestand(f.getType().getName()), "hasA"));
+                }                
+            }
+        }
+        Relatie[] temp = getRelaties();
+        if (temp != null) {
+            for (Relatie t : temp) {
+                rel.add(t);
+            }
+        }
+        Relatie[] tempRelaties = new Relatie[rel.size()];
+        for (int i = 0; i < rel.size(); i++) {
+            tempRelaties[i] = rel.get(i);
+        }
+        setRelaties(tempRelaties);
+    }
+
+    /**
+     * Opvragen van het aantal has a relaties
+     * Methode wordt gebruikt bij het aanmaken van package.bluej
+     * @return
+     */
     public int getAantalHasARelaties() {
         Relatie[] rel = getRelaties();
         int aantalDeps = 0;

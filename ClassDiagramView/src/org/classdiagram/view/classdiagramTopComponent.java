@@ -113,7 +113,8 @@ public final class classdiagramTopComponent extends TopComponent {
             } /*Doe iets indien het om een standaard Java project gaat*/ else if (projectDir.getFileObject("src") != null) {
                 System.out.println("***Project type: Standaard java project");
                 verwerkNetBeansJavaProject(projectDir);
-                //blueJData.setIsARelaties();
+                blueJData.setIsARelaties();
+                blueJData.setHasARelaties();
                 //blueJData.setPackageBlueJ();
             }
 
