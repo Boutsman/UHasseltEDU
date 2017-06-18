@@ -6,10 +6,14 @@ import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -30,6 +34,7 @@ import org.netbeans.api.visual.widget.LabelWidget;
 import org.netbeans.api.visual.widget.LayerWidget;
 import org.netbeans.api.visual.widget.Widget;
 import org.openide.util.Exceptions;
+import org.project.data.ObjectenBench;
 
 /**
  * @author Stijn Boutsen
@@ -76,27 +81,25 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                         //System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed." + event.getSource());
 
                         Method[] methodes = node.getClass().getDeclaredMethods();
-                        tekenJFrame(methodes[Integer.parseInt(parts[0])]);
+                        //tekenJFrame(methodes[Integer.parseInt(parts[0])]);
 
                         Method m = methodes[Integer.parseInt(parts[0])];
 
                         //Ga na of het een getter of setter is
                         if (methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName().equals("void")) {
                             System.out.println("Methode zonder returnwaarde");
-                           // System.out.println(methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName());
-                            if (m.getParameters() != null) {
-                                try {
-                                    m.invoke(node /*,parameters*/);
-                                    //m = reflectie.createInstance(node.laadKlasse(), Integer.parseInt(parts[0]));
-                                } catch (IllegalAccessException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                } catch (IllegalArgumentException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                } catch (InvocationTargetException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                }
+                            // System.out.println(methodes[Integer.parseInt(parts[0])].getReturnType().getSimpleName());
+                            if (m.getParameters().length != 0) {
+
+                                System.out.println("Methode met parameters");
+                                tekenJFrame(node, m);
+                                //m.invoke(node /*,parameters*/);
+                                //m = reflectie.createInstance(node.laadKlasse(), Integer.parseInt(parts[0]));
+
                             } else {
+                                System.out.println("Methode zonder parameters");
                                 try {
+                                    //tekenJFrame(m);
                                     m.invoke(node);
                                 } catch (IllegalAccessException ex) {
                                     Exceptions.printStackTrace(ex);
@@ -108,10 +111,11 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                             }
                         } else {
                             System.out.println("Methode met returnwaarde");
-                            if (m.getParameters() != null) {
+                            if (m.getParameters().length == 0) {
                                 try {
-                                    Object returnwaarde = m.invoke(node /*, parameters*/);
-                                    System.out.println(returnwaarde.toString());
+                                    System.out.println("Methode zonder parameters");
+                                    Object returnwaarde = m.invoke(node);
+                                    //System.out.println(returnwaarde.toString());
                                     toonReturnWaarde(m, returnwaarde.toString());
                                     //m = reflectie.createInstance(node.laadKlasse(), Integer.parseInt(parts[0]));
                                 } catch (IllegalAccessException ex) {
@@ -122,15 +126,10 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                                     Exceptions.printStackTrace(ex);
                                 }
                             } else {
-                                try {
-                                    Object returnwaarde = m.invoke(node);
-                                } catch (IllegalAccessException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                } catch (IllegalArgumentException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                } catch (InvocationTargetException ex) {
-                                    Exceptions.printStackTrace(ex);
-                                }
+
+                                System.out.println("Methode met parameters");
+                                tekenJFrame(node, m);
+
                             }
                         }
                     }
@@ -156,7 +155,6 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
         connection.setTargetAnchorShape(AnchorShape.TRIANGLE_FILLED);
         float[] dashes = {10, 10};
         connection.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, dashes, 2));   //BasicStroke(float width, int cap, int join, float miterlimit, float[] dash, float dash_phase)
-        //connection.setRouter(RouterFactory.createOrthogonalSearchRouter(mainLayer/*,connectionLayer*/));
         connectionLayer.addChild(connection);
         return connection;
     }
@@ -173,13 +171,19 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
         ((ConnectionWidget) findWidget(edge)).setTargetAnchor(AnchorFactory.createRectangularAnchor(w));
     }
 
-    private void tekenJFrame(Method methode) {
+    private static Object convert(Class<?> targetType, String textWaarde) {
+        PropertyEditor editor = PropertyEditorManager.findEditor(targetType);
+        editor.setAsText(textWaarde);
+        return editor.getValue();
+    }
+
+    private void tekenJFrame(final Object node, final Method methode) {
         Parameter[] params = methode.getParameters();
-        Class[] paramTypes = methode.getParameterTypes();
-        System.out.println("Methode wordt opgeroepen " + methode.getName() + " " + params.length);
+        final Class[] paramTypes = methode.getParameterTypes();
+        //System.out.println("Methode wordt opgeroepen " + methode.getName() + " " + params.length);
 
         if (params.length > 0) {
-            JFrame methodesFrame = new JFrame();
+            final JFrame methodesFrame = new JFrame();
             methodesFrame.setTitle("Add method parameters");
 
             methodesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -189,7 +193,7 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
             // https://docs.oracle.com/javase/tutorial/uiswing/layout/spring.html
             SpringLayout layout = new SpringLayout();
             JPanel panel = new JPanel(layout);
-            JTextField[] textFieldParam = new JTextField[params.length];
+            final JTextField[] textFieldParam = new JTextField[params.length];
             for (int i = 0; i < params.length; i++) {
                 JLabel paramLabel = new JLabel(params[i].getName(), JLabel.TRAILING);
                 panel.add(paramLabel);
@@ -198,6 +202,44 @@ public class ObjectenBenchGraphScene extends GraphScene<Object, Object> {
                 textFieldParam[i].setBackground(Color.white);
                 panel.add(textFieldParam[i]);
             }
+
+            panel.add(new JLabel("Voer methode uit"));
+            JButton okBtn = new JButton("OK");
+            okBtn.setActionCommand("disable");
+            okBtn.addActionListener(new ActionListener() {
+                //@Override
+                public void actionPerformed(ActionEvent e) {
+                    //System.out.println("Btn clicked");
+                    //System.out.println("Voer methode uit met volgende parameters:");
+                    ArrayList<Object> params = new ArrayList<Object>();
+                    int i = 0;
+                    for (JTextField textFieldParam : textFieldParam) {
+                        //System.out.println(paramTypes[i] + " - " + textFieldParam.getText());
+                        //System.out.println(convert(paramTypes[i], textFieldParam.getText()));
+                        params.add(convert(paramTypes[i], textFieldParam.getText()));
+                    }
+                    try {
+                        if (methode.getReturnType().getSimpleName().equals("void")) {
+                            methode.invoke(node, params.toArray(new Object[params.size()]));
+                        } else {
+                            Object returnwaarde = methode.invoke(node, params.toArray(new Object[params.size()]));
+                            //System.out.println(returnwaarde.toString());
+                            toonReturnWaarde(methode, returnwaarde.toString());
+                        }
+
+                    } catch (IllegalAccessException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (IllegalArgumentException ex) {
+                        Exceptions.printStackTrace(ex);
+                    } catch (InvocationTargetException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+
+                    //close the JFrame
+                    methodesFrame.dispose();
+                }
+            });
+            panel.add(okBtn);
 
             SpringUtilities.makeGrid(panel,
                     params.length, 2, //rows, cols
